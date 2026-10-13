@@ -1,0 +1,10 @@
+{
+  "name": "workpilot-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix workpilot-autonomous-mern",
+    "seed": "npm run seed -w server --prefix workpilot-autonomous-mern",
+    "test": "npm test --prefix workpilot-autonomous-mern",
+    "build": "npm run build --prefix workpilot-autonomous-mern"
+  }
+}

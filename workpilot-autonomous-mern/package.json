@@ -1,0 +1,16 @@
+{
+  "name": "workpilot-mern",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev -w server\" \"npm run dev -w client\"",
+    "test": "npm test -w server",
+    "build": "npm run build -w client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

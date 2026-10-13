@@ -1,0 +1,4 @@
+import {chromium} from 'playwright';
+// Optional real browser capability; deliberately not exposed as arbitrary user URL navigation.
+// Only allowlisted hosts may be opened. No credentials or secrets are supplied to page scripts.
+export async function inspectPage(url){const target=new URL(url);const allowed=(process.env.BROWSER_ALLOWLIST||'localhost,127.0.0.1').split(',').map(s=>s.trim());if(!['http:','https:'].includes(target.protocol)||!allowed.includes(target.hostname))throw Error('Browser destination not allowlisted');const browser=await chromium.launch({headless:true});try{const page=await browser.newPage();await page.goto(target.toString(),{waitUntil:'domcontentloaded',timeout:10000});return {title:await page.title(),heading:await page.locator('h1').first().textContent().catch(()=>null),url:page.url()};}finally{await browser.close();}}

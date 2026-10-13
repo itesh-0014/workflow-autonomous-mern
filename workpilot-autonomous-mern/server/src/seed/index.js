@@ -1,0 +1,10 @@
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import {User,Ticket,Policy} from '../models/index.js';
+await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017/workpilot');
+const email=process.env.DEMO_EMAIL||'admin@example.com';const password=process.env.DEMO_PASSWORD;if(!password||password.length<12)throw Error('Set DEMO_PASSWORD (12+ characters)');
+await User.updateOne({email},{$set:{passwordHash:await bcrypt.hash(password,12),role:'admin'}},{upsert:true});
+if(!await Policy.countDocuments())await Policy.insertMany([{title:'Escalation policy',body:'High and critical tickets require a follow-up task. Assign to existing owner or support-lead. External messages require human approval.',tags:['support','escalation']},{title:'Customer communication',body:'Never promise resolution deadlines without confirmation. All outbound customer messages require human approval.',tags:['support','communication']}]);
+if(!await Ticket.countDocuments())await Ticket.insertMany([{subject:'Billing charged twice',description:'Customer reports a duplicate invoice charge',customerEmail:'billing@example.test',priority:'critical',assignee:'billing-lead'},{subject:'SSO login failure',description:'Enterprise account cannot authenticate',customerEmail:'it@example.test',priority:'high',assignee:'platform-team'},{subject:'Change profile picture',description:'Customer asks how to upload a profile photo',customerEmail:'hello@example.test',priority:'low',assignee:'support-team'}]);
+console.log(`Seed complete. Login: ${email}`);await mongoose.disconnect();

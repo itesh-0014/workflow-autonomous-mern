@@ -1,0 +1,2 @@
+import {describe,it,expect} from 'vitest';import request from 'supertest';import {app} from '../src/app.js';
+describe('API boundary',()=>{it('exposes health',async()=>{const r=await request(app).get('/health');expect(r.status).toBe(200);expect(r.body.ok).toBe(true);});it('rejects anonymous runs',async()=>{const r=await request(app).get('/api/runs');expect(r.status).toBe(401);});it('rejects malformed login',async()=>{const r=await request(app).post('/api/auth/login').send({email:'bad'});expect(r.status).toBe(400);});});

@@ -1,0 +1,11 @@
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import {createServer} from 'node:http';
+import {Server} from 'socket.io';
+import {app} from './app.js';
+import {startWorker} from './agent/runner.js';
+if(!process.env.JWT_SECRET||process.env.JWT_SECRET.length<20)throw Error('Set JWT_SECRET (20+ characters)');
+await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017/workpilot');
+const server=createServer(app);const io=new Server(server,{cors:{origin:process.env.CLIENT_ORIGIN||'http://localhost:5173'}});globalThis.io=io;
+io.on('connection',socket=>{socket.on('run:subscribe',async({runId,token}={})=>{try{const jwt=(await import('jsonwebtoken')).default;const {Run}=await import('./models/index.js');const user=jwt.verify(token,process.env.JWT_SECRET);const run=await Run.findOne({_id:runId,owner:user.id});if(run)socket.join(String(run._id));}catch{}});});
+startWorker();server.listen(Number(process.env.PORT||4000),()=>console.log('API running on http://localhost:'+(process.env.PORT||4000)));
